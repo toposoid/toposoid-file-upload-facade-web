@@ -1,7 +1,7 @@
 version: '3'
 services:
   toposoid-file-upload-facade-web:
-    image: toposoid-file-upload-facade-web
+    image: toposoid-file-upload-facade-web:0.7-SNAPSHOT
     tty: true
     environment:
       - TOPOSOID_CONTENTS_URL=http://toposoid-contents-admin-web:9012/
