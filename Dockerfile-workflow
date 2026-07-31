@@ -1,0 +1,19 @@
+FROM python:3.10
+
+WORKDIR /app
+ARG TARGET_BRANCH
+ENV DEPLOYMENT=local
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && apt-get upgrade -y \
+&& apt-get -y install git unzip libgl1-mesa-dev cron \
+&& curl -LsSf https://astral.sh/uv/install.sh | sh \
+&& source ${HOME}/.local/bin/env \
+&& git clone https://github.com/toposoid/toposoid-file-upload-facade-web.git \
+&& cd toposoid-file-upload-facade-web \
+&& git fetch origin ${TARGET_BRANCH} \
+&& git checkout ${TARGET_BRANCH} \
+&& sed s/__##GIT_BRANCH##__/${TARGET_BRANCH}/g pyproject.toml.template > pyproject.toml \
+&& uv sync \
+&& uv add git+https://github.com/toposoid/toposoid-python-lib.git@${TARGET_BRANCH}#egg=ToposoidCommon 

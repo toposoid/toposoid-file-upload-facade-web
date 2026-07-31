@@ -1,0 +1,26 @@
+[project]
+name = "toposoid-file-upload-facade-web"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "clamd>=1.0.2",
+    "fastapi[all]==0.112.2",
+    "pydantic==2.8.2",
+    "pytest==7.4.4",
+    "toposoid-python-lib",
+    "uvicorn[standard]==0.15.0",
+    "requests==2.31.0",
+    "charset-normalizer>=3.4.9",
+    "numpy==1.26.4",
+    "opencv-python==4.10.0.84",
+    "xls2xlsx>=0.2.0",
+    "pandas>=2.3.3",
+    "python-magic>=0.4.27",
+    "boto3>=1.43.55",
+    "anyio[trio]>=3.7.1",
+]
+
+[tool.uv.sources]
+toposoid-python-lib = { git = "https://github.com/toposoid/toposoid-python-lib.git", branch = "__##GIT_BRANCH##__" }
