@@ -25,8 +25,8 @@ jobs:
             docker compose -f docker-compose-workflow.yml up -d
             for i in {1..10}; do echo "PING" | nc -w 5 localhost 3310 | grep -q "PONG" && { echo "OK!"; break; } || { echo "NG ($i/10) RETRY..."; sleep 2; [ $i -eq 10 ] && exit 1; }; done
             docker compose logs
-            docker compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} bash -c "python -m http.server 8000 -d /app/${{ env.PJ_REPO }}/testdata &"
-            sleep 10
+            #docker compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} bash -c "python -m http.server 8000 -d /app/${{ env.PJ_REPO }}/testdata &"
+            #sleep 10
             docker compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} bash -c "cd ${{ env.PJ_REPO }} && source /root/.local/bin/env && uv run pytest -v"
             docker rm --force $(docker ps -a -q) > /dev/null 2>&1 && :
             docker rmi --force ${{ env.PJ_REPO }}:${{ env.PJ_VERSION }}
