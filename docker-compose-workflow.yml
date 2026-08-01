@@ -17,8 +17,7 @@ services:
     image: clamav/clamav-debian
     container_name: clamav
     ports:
-      - "3310:3310"
-    restart: always
+      - "3310:3310"    
     healthcheck:
       # コンテナ内で繰り返し疎通確認を行う設定
       test: ["CMD-SHELL", "echo 'PING' | curl -s telnet://localhost:3310 | grep -q 'PONG' || exit 1"]
