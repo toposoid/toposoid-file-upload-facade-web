@@ -18,8 +18,12 @@ jobs:
         run: |
             cd ${GITHUB_WORKSPACE} && cd ../
             cd ./${{ env.PJ_REPO }}
+            docker rm --force $(docker ps -a -q) > /dev/null 2>&1 && :
+            docker rmi --force ${{ env.PJ_REPO }}:${{ env.PJ_VERSION }}> /dev/null 2>&1 && :
+            docker rmi --force toposoid/${{ env.PJ_REPO }}:${{ env.PJ_VERSION }}> /dev/null 2>&1 && :            
             docker build --build-arg TARGET_BRANCH=${{ env.PJ_BRANCH }} --tag ${{ env.PJ_REPO }}:${{ env.PJ_VERSION }} -f Dockerfile-workflow .
             docker compose -f docker-compose-workflow.yml up -d
+            for i in {1..10}; do echo "PING" | nc -w 2 localhost 3310 | grep -q "PONG" && { echo "OK!"; break; } || { echo "NG ($i/10) RETRY..."; sleep 2; [ $i -eq 10 ] && exit 1; }; done
             docker compose logs
             docker compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} bash -c "cd ${{ env.PJ_REPO }}/testdata && python -m http.server 8000"
             docker compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} bash -c "cd ${{ env.PJ_REPO }} && source /root/.local/bin/env && uv run pytest -v"
