@@ -11,19 +11,21 @@ services:
       - TOPOSOID_FILESCAN_PORT=3310
     ports:
       - 9024:9024
-    depends_on: { clamav: { condition: service_healthy } }
+    healthcheck:
+      # コンテナ内で繰り返し疎通確認を行う設定
+      test: ["CMD-SHELL", "echo 'PING' | curl -s telnet://clamav:3310 | grep -q 'PONG' || exit 1"]
+      interval: 5s    # 5秒ごとにチェック
+      timeout: 3s     # 3秒でタイムアウト
+      retries: 10     # 10回連続失敗で不健全（Unhealthy）とみなす    
+    depends_on:
+      - clamav
+
 
   clamav:
     image: clamav/clamav-debian
     container_name: clamav
     ports:
       - "3310:3310"    
-    healthcheck:
-      # コンテナ内で繰り返し疎通確認を行う設定
-      test: ["CMD-SHELL", "echo 'PING' | curl -s telnet://localhost:3310 | grep -q 'PONG' || exit 1"]
-      interval: 5s    # 5秒ごとにチェック
-      timeout: 3s     # 3秒でタイムアウト
-      retries: 10     # 10回連続失敗で不健全（Unhealthy）とみなす    
 
   toposoid-contents-admin-web:
     image: toposoid/toposoid-contents-admin-web:0.7-SNAPSHOT
