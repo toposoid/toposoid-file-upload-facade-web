@@ -104,7 +104,7 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
                     transferResponse = requests.post(url, files=files, headers=requestHeaders)  
                     statusInfo = parse_obj_as(StatusInfo, transferResponse.json())
                 if statusInfo.status == "OK":
-                    url = os.environ["TOPOSOID_CONTENTS_URL"] + "contents/temporaryUse/" + targetFile
+                    url = os.environ["TOPOSOID_CONTENTS_URL"] + "temporaryUse/" + targetFile
                     uploadStatus = UploadStatusType.OK.value 
                     LOG.info(f"File upload completed.[url:{url}", transversalState)
                     return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url=url, status=uploadStatus)))                            
