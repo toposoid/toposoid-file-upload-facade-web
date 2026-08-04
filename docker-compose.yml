@@ -3,7 +3,7 @@ services:
   toposoid-file-upload-facade-web:
     image: toposoid/toposoid-file-upload-facade-web:0.7-SNAPSHOT
     environment:
-      - TOPOSOID_CONTENTS_URL=http://toposoid-contents-admin-web:9012/
+      - TOPOSOID_CONTENTS_URL=http://toposoid-contents-admin-web:9012/contents/
       - TOPOSOID_CONTENTS_ADMIN_HOST=toposoid-contents-admin-web
       - TOPOSOID_CONTENTS_ADMIN_PORT=9012      
       - TOPOSOID_FILESCAN_HOST=clamav   
