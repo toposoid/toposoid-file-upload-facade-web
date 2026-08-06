@@ -28,20 +28,6 @@ import pandas as pd
 import csv
 
 class TableAdmin():
-
-
-    """
-    def saveTablePermanently(self, knowledgeForTable:KnowledgeForTable, isTemporaryUse = False):
-        #既にtemporaryUseに保存されていることが前提                
-        ext = "." + knowledgeForTable.tableReference.reference.url.split(".")[-1]
-        #保存
-        if not isTemporaryUse:
-            #オリジナルファイルも含めてコピー
-            for target in glob.glob("contents/temporaryUse/%s.*" % (knowledgeForTable.id)):
-                shutil.copy(target, "contents/tables/")                    
-            knowledgeForTable.tableReference.reference.url = os.environ["TOPOSOID_CONTENTS_URL"] + "tables/" + knowledgeForTable.id + ext                    
-        return knowledgeForTable
-    """
     
     def checkFileType(self, filename):
         # ファイルが存在するか確認

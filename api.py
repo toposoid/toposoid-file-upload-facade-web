@@ -38,6 +38,7 @@ from RawDataAdmin import RawDataAdmin
 from ImageAdmin import ImageAdmin
 from TableAdmin import TableAdmin
 import requests
+import magic
 
 LOG = tc.LogUtils(__name__)
 #TOPOSOID_MQ_DOCUMENT_ANALYSIS_QUENE = os.environ["TOPOSOID_MQ_DOCUMENT_ANALYSIS_QUENE"]
@@ -78,11 +79,16 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
 
         status = scanFile.scan_file_via_clamav(savePath, transversalState)
         if status == "OK":                            
-            #オリジナルファイルをまず転送する。
-            LOG.info("Starting transfer of original file.", transversalState)
-            uploadResult = await transfer(id, id, transversalState, isOriginal=True, originalFilename = originalFilename)
-            if not uploadResult.status == UploadStatusType.OK.value:
-                return JSONResponse(content=jsonable_encoder(uploadResult))                            
+            #featureTypeとファイルに齟齬がなければオリジナルファイルをまず転送する。
+            check = await checkFeatureTypeAndMime(savePath, uploadContentContext)
+            if check:
+                LOG.info("Starting transfer of original file.", transversalState)
+                uploadResult = await transfer(id, id, transversalState, isOriginal=True, originalFilename = originalFilename)
+                if not uploadResult.status == UploadStatusType.OK.value:
+                    return JSONResponse(content=jsonable_encoder(uploadResult))                            
+            else:
+                uploadStatus = UploadStatusType.FILE_FORMAT_ERROR.value
+                return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
 
             targetFile = ""
             #ファイルコンバート
@@ -141,6 +147,18 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
         LOG.error(traceback.format_exc(), transversalState)
         return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=UploadStatusType.SYSTEM_ERROR.value)))
         
+
+async def checkFeatureTypeAndMime(path, uploadContentContext):
+    mime = magic.from_file(path, mime=True)
+    if uploadContentContext.featureType == FeatureType.IMAGE.value:
+       return mime.startswith("image/")
+    elif uploadContentContext.featureType == FeatureType.TABLE.value:
+        return mime.startswith("text/") or mime in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]
+    elif uploadContentContext.featureType == FeatureType.DOCUMENT.value:
+        return mime in ["application/pdf", "application/x-pdf","application/acrobat"]
+    else:
+        return False
+
 
 async def transfer(id, targetFile, transversalState, isOriginal=False, originalFilename=""):
     url =  f"http://{os.environ['TOPOSOID_CONTENTS_ADMIN_HOST']}:{os.environ['TOPOSOID_CONTENTS_ADMIN_PORT']}/transferFile"
