@@ -592,6 +592,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!PDF_TEST.pdf", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
