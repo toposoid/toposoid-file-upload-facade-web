@@ -103,6 +103,7 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
                 return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
                 
             if not targetFile == "":
+                
                 #toposoid-contents-adminにファイル移動
                 LOG.info("Starting transfer of converted file.", transversalState)
                 uploadResult = await transfer(id, targetFile, transversalState)

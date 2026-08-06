@@ -75,6 +75,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200
         
@@ -99,6 +103,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200
         #適切にコンバートされているか？
@@ -117,12 +125,16 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.IMAGE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.jpg", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!IMG_TEST.jpg", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200     
         #適切にコンバートされているか？
@@ -147,6 +159,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!IMG_TEST.png", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200
         #適切にコンバートされているか？
@@ -170,6 +186,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -193,6 +213,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -216,6 +240,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -244,6 +272,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -272,6 +304,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -300,6 +336,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -328,6 +368,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -355,6 +399,10 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -376,13 +424,17 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST.xlsx", f)})
                     assert response.status_code == 200
 
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST.xlsx", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200
         #適切にコンバートされているか？
@@ -400,13 +452,17 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST.xls", f)})
                     assert response.status_code == 200
 
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST.xls", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200
         #適切にコンバートされているか？
@@ -424,12 +480,16 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_UTF8.csv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST_UTF8.csv", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -451,12 +511,16 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_UTF8.tsv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST_UTF8.tsv", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -478,12 +542,16 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_UTF8.txt", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST_UTF8.txt", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -505,12 +573,16 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_SJIS.csv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST_SJIS.csv", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -532,12 +604,16 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_SJIS.tsv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST_SJIS.tsv", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -559,12 +635,16 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_SJIS.txt", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
         assert(uploadResult.status == UploadStatusType.OK.value)
         #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        #オリジナルファイル
+        checkResponse = requests.get(f"{uploadResult.url.split('.')[0]}!TABLE_TEST_SJIS.txt", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #変換されたファイル
         checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
         assert checkResponse.status_code == 200  
         #適切にコンバートされているか？
@@ -586,7 +666,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.DOCUMENT.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("PDF_TEST.pdf", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
@@ -619,6 +699,14 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())        
         assert(uploadResult.status == UploadStatusType.FILE_FORMAT_ERROR.value)
 
+        #オリジナルファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+        #変換されたファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+
+
     @pytest.mark.anyio
     async def test_uploadIrregularFile(self): 
         async with AsyncClient(
@@ -631,9 +719,17 @@ class TestToposoidFileUploadFacadeWeb(object):
                     }
                     response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
                     assert response.status_code == 200
+
         
         uploadResult = UploadResult.parse_obj(response.json())        
         assert(uploadResult.status == UploadStatusType.FILE_FORMAT_ERROR.value)
+
+        #オリジナルファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+        #変換されたファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
 
 
     @pytest.mark.anyio
@@ -652,6 +748,14 @@ class TestToposoidFileUploadFacadeWeb(object):
         uploadResult = UploadResult.parse_obj(response.json())        
         assert(uploadResult.status == UploadStatusType.FILE_FORMAT_ERROR.value)
 
+        #オリジナルファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+        #変換されたファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+
+
     @pytest.mark.anyio
     async def test_uploadIrregularFile2(self): 
         async with AsyncClient(
@@ -667,7 +771,14 @@ class TestToposoidFileUploadFacadeWeb(object):
         
         uploadResult = UploadResult.parse_obj(response.json())        
         assert(uploadResult.status == UploadStatusType.FILE_FORMAT_ERROR.value)
-     
+
+        #オリジナルファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+        #変換されたファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+
 
     @pytest.mark.anyio
     async def test_uploadInfectedUrl(self): 
@@ -684,6 +795,13 @@ class TestToposoidFileUploadFacadeWeb(object):
         
         uploadResult = UploadResult.parse_obj(response.json())        
         assert(uploadResult.status == UploadStatusType.FOUND_INFECTED_FILE.value)
+
+        #オリジナルファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}!", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+        #変換されたファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
 
         #ファイルが削除されていることを確認
         assert(not os.path.exists(f"tmp/{uploadResult.id}"))
@@ -703,6 +821,13 @@ class TestToposoidFileUploadFacadeWeb(object):
 
         uploadResult = UploadResult.parse_obj(response.json())        
         assert(uploadResult.status == UploadStatusType.FOUND_INFECTED_FILE.value)
+
+        #オリジナルファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}!INFECTED_FILE_TEST", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
+        #変換されたファイル
+        checkResponse = requests.get(f"{os.environ['TOPOSOID_CONTENTS_URL']}temporaryUse/{uploadResult.id}", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 404  
 
         #ファイルが削除されていることを確認
         assert(not os.path.exists(f"tmp/{uploadResult.id}"))
