@@ -400,7 +400,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST.xls", f)})
                     assert response.status_code == 200
 
 
@@ -424,7 +424,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_UTF8.csv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
@@ -451,7 +451,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_UTF8.tsv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
@@ -478,7 +478,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_UTF8.txt", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
@@ -505,7 +505,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_SJIS.csv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
@@ -532,7 +532,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_SJIS.tsv", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
@@ -559,7 +559,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("TABLE_TEST_SJIS.txt", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())
@@ -625,7 +625,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IRREGULAR_TEST", f)})
                     assert response.status_code == 200
         
         uploadResult = UploadResult.parse_obj(response.json())        
@@ -658,7 +658,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("PDF_TEST.pdf", f)})
                     assert response.status_code == 200
         
         uploadResult = UploadResult.parse_obj(response.json())        
@@ -694,7 +694,7 @@ class TestToposoidFileUploadFacadeWeb(object):
                         "featureType": int(FeatureType.TABLE.value),
                         "url": None
                     }
-                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("IMG_TEST.png", f)})
+                    response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data, files={"uploadfile": ("INFECTED_FILE_TEST", f)})
                     assert response.status_code == 200
 
         uploadResult = UploadResult.parse_obj(response.json())        
