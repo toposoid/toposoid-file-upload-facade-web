@@ -73,7 +73,7 @@ class TableAdmin():
             ext = filename.split(".")[-1]        
             if not ext == "xslx":
                 #ファイルをリネームして返す
-                shutil.move(filename, f"tmp/{id}.xslx")    
+                shutil.copy(filename, f"tmp/{id}.xslx")    
             return f"{id}.xslx"      
 
         if tableFileType == TableFileType.EXCEL_OLD:
@@ -101,8 +101,7 @@ class TableAdmin():
             byte_stream = io.BytesIO(content)
             text_stream = io.TextIOWrapper(byte_stream, encoding=res.best().encoding if res.best() is not None else 'utf-8', errors='ignore')        
             tableFilename = f'tmp/{id}.txt'
-            #削除
-            os.remove(filename)
+                        
             #UTF8にコンバート            
             with open(tableFilename, 'w', encoding='utf-8') as f:
                 f.write(text_stream.read())

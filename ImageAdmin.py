@@ -29,9 +29,7 @@ class ImageAdmin():
             image = cv2.imread(filename)
             jpegFilename = 'tmp/' + id + ".jpg"
             #JPEGに変換
-            cv2.imwrite(jpegFilename, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-            #削除
-            os.remove(filename)
+            cv2.imwrite(jpegFilename, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])            
             return id + ".jpg"
         except:
             LOG.error(traceback.format_exc(), transversalState)

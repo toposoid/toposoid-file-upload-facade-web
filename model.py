@@ -33,8 +33,9 @@ class UploadStatusType(Enum):
     FOUND_INFECTED_FILE = 2
     SCAN_ERROR = 3
     FILE_FORMAT_ERROR = 4
-    CONVERT_ERROR = 5
-    TRANSFER_ERROR = 6 
+    ORIGINAL_FILE_TRANSFER_ERROR = 5
+    CONVERT_ERROR = 6
+    CONVERT_FILE_TRANSFER_ERROR = 7 
     SYSTEM_ERROR = -1
 
 class UploadContentContext(BaseModel):

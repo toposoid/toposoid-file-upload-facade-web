@@ -64,6 +64,7 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
     transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))
     id = str(uuid.uuid1())
     uploadStatus = UploadStatusType.UNSPECIFIED.value 
+    originalFilename = ""
     try:        
         scanFile = ScanFile(os.environ["TOPOSOID_FILESCAN_HOST"], int(os.environ["TOPOSOID_FILESCAN_PORT"]), transversalState)        
         savePath = f"tmp/{id}" 
@@ -73,21 +74,44 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
         else:
             #2026/07現在、一つだけファイルは送られてくる想定
             rawDataAdmin.getRawData(id, uploadfile.file, uploadfile.filename, savePath)                                    
+            #もしパスが送られてきたらファイル名だけ取得する。
+            if "/" in originalFilename:
+                originalFilename = uploadfile.filename.split("/")[-1]
+            else:
+                originalFilename = uploadfile.filename                                
 
         status = scanFile.scan_file_via_clamav(savePath, transversalState)
         if status == "OK":                            
             targetFile = ""
             #ファイルコンバート
             if uploadContentContext.featureType == FeatureType.IMAGE.value:
+                #先にファイルを評価(変なテキスファイルが転送されrないように)
                 imageAdmin = ImageAdmin()
                 targetFile = imageAdmin.convertJpeg(savePath, id, transversalState)
-                
+                #オリジナルファイル転送
+                statusInfo = transfer(savePath, f"{id}!{originalFilename}", X_TOPOSOID_TRANSVERSAL_STATE)
+                if not statusInfo.status == "OK":
+                    uploadStatus = UploadStatusType.ORIGINAL_FILE_TRANSFER_ERROR.value
+                    return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
+                os.remove(savePath)
             elif uploadContentContext.featureType == FeatureType.TABLE.value:
+                #先にファイルを評価(変なテキスファイルが転送されrないように)
                 tableAdmin = TableAdmin()
+                #xlsxもしくはtsvに変換
                 targetFile = tableAdmin.convert(savePath, id, transversalState)
-
+                #オリジナルファイル転送
+                if not targetFile == "":
+                    statusInfo = transfer(savePath, f"{id}!{originalFilename}", X_TOPOSOID_TRANSVERSAL_STATE)
+                    if not statusInfo.status == "OK":
+                        uploadStatus = UploadStatusType.ORIGINAL_FILE_TRANSFER_ERROR.value
+                        return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
+                    os.remove(savePath)
             elif uploadContentContext.featureType == FeatureType.DOCUMENT.value:
-                #何もしない
+                #オリジナルファイル転送
+                statusInfo = transfer(savePath, f"{id}!{originalFilename}", X_TOPOSOID_TRANSVERSAL_STATE)
+                if not statusInfo.status == "OK":
+                    uploadStatus = UploadStatusType.ORIGINAL_FILE_TRANSFER_ERROR.value
+                    return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
                 targetFile = f"{id}.pdf"            
                 shutil.move(savePath, f"tmp/{targetFile}")                
             else:
@@ -95,21 +119,15 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
                 return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
                 
             if not targetFile == "":
-                #toposoid-contents-adminにファイル移動
-                url =  f"http://{os.environ['TOPOSOID_CONTENTS_ADMIN_HOST']}:{os.environ['TOPOSOID_CONTENTS_ADMIN_PORT']}/transferFile"
-                with open(f"tmp/{targetFile}", 'rb') as f:
-                    # (ファイル名, ファイルオブジェクト, Content-Type) の順に指定可能
-                    files = {'uploadfile': (targetFile, f)}         
-                    requestHeaders = {'X_TOPOSOID_TRANSVERSAL_STATE': X_TOPOSOID_TRANSVERSAL_STATE}   
-                    transferResponse = requests.post(url, files=files, headers=requestHeaders)  
-                    statusInfo = parse_obj_as(StatusInfo, transferResponse.json())
+                #toposoid-contents-adminに変換したファイル移動
+                statusInfo = transfer(f"tmp/{targetFile}", targetFile, X_TOPOSOID_TRANSVERSAL_STATE)
                 if statusInfo.status == "OK":
                     url = os.environ["TOPOSOID_CONTENTS_URL"] + "temporaryUse/" + targetFile
                     uploadStatus = UploadStatusType.OK.value 
                     LOG.info(f"File upload completed.[url:{url}", transversalState)
                     return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url=url, status=uploadStatus)))                            
                 else:
-                    uploadStatus = UploadStatusType.TRANSFER_ERROR.value
+                    uploadStatus = UploadStatusType.CONVERT_FILE_TRANSFER_ERROR.value
                     return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
             else:
                 uploadStatus = UploadStatusType.FILE_FORMAT_ERROR.value
@@ -128,3 +146,11 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
         
 
 
+def transfer(savePath, filename, transversalState):
+    url =  f"http://{os.environ['TOPOSOID_CONTENTS_ADMIN_HOST']}:{os.environ['TOPOSOID_CONTENTS_ADMIN_PORT']}/transferFile"
+    with open(savePath, 'rb') as f:
+        # (ファイル名, ファイルオブジェクト, Content-Type) の順に指定可能
+        files = {'uploadfile': (filename, f)}         
+        requestHeaders = {'X_TOPOSOID_TRANSVERSAL_STATE': transversalState}   
+        transferResponse = requests.post(url, files=files, headers=requestHeaders)  
+        return parse_obj_as(StatusInfo, transferResponse.json())
