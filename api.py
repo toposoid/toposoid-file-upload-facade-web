@@ -38,7 +38,6 @@ from RawDataAdmin import RawDataAdmin
 from ImageAdmin import ImageAdmin
 from TableAdmin import TableAdmin
 import requests
-import magic
 
 LOG = tc.LogUtils(__name__)
 #TOPOSOID_MQ_DOCUMENT_ANALYSIS_QUENE = os.environ["TOPOSOID_MQ_DOCUMENT_ANALYSIS_QUENE"]
@@ -69,27 +68,14 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
         scanFile = ScanFile(os.environ["TOPOSOID_FILESCAN_HOST"], int(os.environ["TOPOSOID_FILESCAN_PORT"]), transversalState)        
         savePath = f"tmp/{id}" 
         status = ""
-        originalFilename = ""
         if uploadfile is None:
-            rawDataAdmin.getRawData(id, None, uploadContentContext.url, savePath)
+            rawDataAdmin.getRawData(id, None, uploadContentContext.url, savePath)               
         else:
             #2026/07現在、一つだけファイルは送られてくる想定
-            rawDataAdmin.getRawData(id, uploadfile.file, uploadfile.filename, savePath)  
-            originalFilename = uploadfile.filename                                  
+            rawDataAdmin.getRawData(id, uploadfile.file, uploadfile.filename, savePath)                                    
 
         status = scanFile.scan_file_via_clamav(savePath, transversalState)
         if status == "OK":                            
-            #featureTypeとファイルに齟齬がなければオリジナルファイルをまず転送する。
-            check = await checkFeatureTypeAndMime(savePath, uploadContentContext)
-            if check:
-                LOG.info("Starting transfer of original file.", transversalState)
-                uploadResult = await transfer(id, id, transversalState, isOriginal=True, originalFilename = originalFilename)
-                if not uploadResult.status == UploadStatusType.OK.value:
-                    return JSONResponse(content=jsonable_encoder(uploadResult))                            
-            else:
-                uploadStatus = UploadStatusType.FILE_FORMAT_ERROR.value
-                return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
-
             targetFile = ""
             #ファイルコンバート
             if uploadContentContext.featureType == FeatureType.IMAGE.value:
@@ -98,7 +84,7 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
                 
             elif uploadContentContext.featureType == FeatureType.TABLE.value:
                 tableAdmin = TableAdmin()
-                targetFile = tableAdmin.convert(savePath, id)
+                targetFile = tableAdmin.convert(savePath, id, transversalState)
 
             elif uploadContentContext.featureType == FeatureType.DOCUMENT.value:
                 #何もしない
@@ -109,18 +95,12 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
                 return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
                 
             if not targetFile == "":
-                
                 #toposoid-contents-adminにファイル移動
-                LOG.info("Starting transfer of converted file.", transversalState)
-                uploadResult = await transfer(id, targetFile, transversalState)
-                return JSONResponse(content=jsonable_encoder(uploadResult))                            
-                """
                 url =  f"http://{os.environ['TOPOSOID_CONTENTS_ADMIN_HOST']}:{os.environ['TOPOSOID_CONTENTS_ADMIN_PORT']}/transferFile"
                 with open(f"tmp/{targetFile}", 'rb') as f:
                     # (ファイル名, ファイルオブジェクト, Content-Type) の順に指定可能
                     files = {'uploadfile': (targetFile, f)}         
-                    #requestHeaders = {'X_TOPOSOID_TRANSVERSAL_STATE': X_TOPOSOID_TRANSVERSAL_STATE}   
-                    requestHeaders = {'X_TOPOSOID_TRANSVERSAL_STATE': str(jsonable_encoder(transversalState))}   
+                    requestHeaders = {'X_TOPOSOID_TRANSVERSAL_STATE': X_TOPOSOID_TRANSVERSAL_STATE}   
                     transferResponse = requests.post(url, files=files, headers=requestHeaders)  
                     statusInfo = parse_obj_as(StatusInfo, transferResponse.json())
                 if statusInfo.status == "OK":
@@ -131,7 +111,6 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
                 else:
                     uploadStatus = UploadStatusType.TRANSFER_ERROR.value
                     return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
-                """
             else:
                 uploadStatus = UploadStatusType.FILE_FORMAT_ERROR.value
                 return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=uploadStatus)))        
@@ -145,44 +124,7 @@ async def upload(uploadContentContext:UploadContentContext= Depends(UploadConten
 
     except Exception as e:
         LOG.error(traceback.format_exc(), transversalState)
-        return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url="", status=UploadStatusType.SYSTEM_ERROR.value)))
+        return JSONResponse(content=jsonable_encoder(UploadResult(id=id, url=url, status=UploadStatusType.SYSTEM_ERROR.value)))
         
 
-async def checkFeatureTypeAndMime(path, uploadContentContext):
-    mime = magic.from_file(path, mime=True)
-    if uploadContentContext.featureType == FeatureType.IMAGE.value:
-       return mime.startswith("image/")
-    elif uploadContentContext.featureType == FeatureType.TABLE.value:
-        return mime.startswith("text/") or mime in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]
-    elif uploadContentContext.featureType == FeatureType.DOCUMENT.value:
-        return mime in ["application/pdf", "application/x-pdf","application/acrobat"]
-    else:
-        return False
 
-
-async def transfer(id, targetFile, transversalState, isOriginal=False, originalFilename=""):
-    url =  f"http://{os.environ['TOPOSOID_CONTENTS_ADMIN_HOST']}:{os.environ['TOPOSOID_CONTENTS_ADMIN_PORT']}/transferFile"
-
-    #オリジナルファイルの場合は、コピーを別名にして送り元ファイルを削除しない。
-    if isOriginal:
-        if originalFilename == "":        
-            shutil.copy(f"tmp/{targetFile}", f"tmp/{targetFile}!")
-            targetFile = f"{targetFile}!"
-        else:
-            shutil.copy(f"tmp/{targetFile}", f"tmp/{targetFile}!{originalFilename}")
-            targetFile = f"{targetFile}!{originalFilename}"
-
-    with open(f"tmp/{targetFile}", 'rb') as f:
-        # (ファイル名, ファイルオブジェクト, Content-Type) の順に指定可能
-        files = {'uploadfile': (targetFile, f)}         
-        requestHeaders = {'X_TOPOSOID_TRANSVERSAL_STATE': str(jsonable_encoder(transversalState))}   
-        transferResponse = requests.post(url, files=files, headers=requestHeaders)  
-        statusInfo = parse_obj_as(StatusInfo, transferResponse.json())
-    if statusInfo.status == "OK":
-        url = os.environ["TOPOSOID_CONTENTS_URL"] + "temporaryUse/" + targetFile
-        uploadStatus = UploadStatusType.OK.value 
-        LOG.info(f"File upload completed.[url:{url}", transversalState)
-        return UploadResult(id=id, url=url, status=uploadStatus)                         
-    else:
-        uploadStatus = UploadStatusType.TRANSFER_ERROR.value
-        return UploadResult(UploadResult(id=id, url="", status=uploadStatus))

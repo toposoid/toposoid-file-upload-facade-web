@@ -26,8 +26,25 @@ from model import TableFileType
 from xls2xlsx import XLS2XLSX
 import pandas as pd
 import csv
+from itertools import islice
+import ToposoidCommon as tc
+LOG = tc.LogUtils(__name__)
 
 class TableAdmin():
+
+
+    """
+    def saveTablePermanently(self, knowledgeForTable:KnowledgeForTable, isTemporaryUse = False):
+        #既にtemporaryUseに保存されていることが前提                
+        ext = "." + knowledgeForTable.tableReference.reference.url.split(".")[-1]
+        #保存
+        if not isTemporaryUse:
+            #オリジナルファイルも含めてコピー
+            for target in glob.glob("contents/temporaryUse/%s.*" % (knowledgeForTable.id)):
+                shutil.copy(target, "contents/tables/")                    
+            knowledgeForTable.tableReference.reference.url = os.environ["TOPOSOID_CONTENTS_URL"] + "tables/" + knowledgeForTable.id + ext                    
+        return knowledgeForTable
+    """
     
     def checkFileType(self, filename):
         # ファイルが存在するか確認
@@ -47,24 +64,24 @@ class TableAdmin():
         else:
             return TableFileType.NOT_APPLICABLE
 
-    def convert(self, filename, id):
+    def convert(self, filename, id, transversalState):
         
         tableFileType = self.checkFileType(filename)        
 
         #このファイルがExcelファイルかテキストファイルかを見分ける
         if tableFileType == TableFileType.EXCEL:    
             ext = filename.split(".")[-1]        
-            if not ext == "xlsx":
+            if not ext == "xslx":
                 #ファイルをリネームして返す
-                shutil.move(filename, f"tmp/{id}.xlsx")    
-            return f"{id}.xlsx"      
+                shutil.move(filename, f"tmp/{id}.xslx")    
+            return f"{id}.xslx"      
 
         if tableFileType == TableFileType.EXCEL_OLD:
-            #ファイルフォーマットをxlsxに変換
+            #ファイルフォーマットをxslxに変換
             x2x = XLS2XLSX(filename)
             #ファイルをリネームして返す
-            x2x.to_xlsx(f"tmp/{id}.xlsx")
-            return f"{id}.xlsx"      
+            x2x.to_xlsx(f"tmp/{id}.xslx")
+            return f"{id}.xslx"      
             
         elif tableFileType == TableFileType.TEXT:            
             with open(filename, 'rb') as f:
@@ -89,49 +106,66 @@ class TableAdmin():
             #UTF8にコンバート            
             with open(tableFilename, 'w', encoding='utf-8') as f:
                 f.write(text_stream.read())
-            if self.isTablefile(tableFilename):
-                #区切り文字を文字を自動判定
-                #with open(tableFilename, 'r', encoding='utf-8') as f:
-                #    # 先頭の1024バイトから区切り文字を推測
-                #    dialect = csv.Sniffer().sniff(f.read(1024))            
-                #df = pd.read_csv(tableFilename, sep=dialect.delimiter)
-                df = pd.read_csv(tableFilename, sep=None, engine='python')
 
-                # タブ区切り（sep='\t'）でファイルに出力
-                df.to_csv(f"tmp/{id}.tsv", sep='\t', index=False)  
-                #削除
-                os.remove(tableFilename)
-                return f"{id}.tsv"
-            else:
-                return ""
+            return self.analyzeTablefile(id, tableFilename,  transversalState)
         else:
             return ""
 
-    def isTablefile(self, filename):
-        #区切り文字を文字を自動判定
-        with open(filename, 'r', encoding='utf-8') as f:
-            #先頭の1024バイトから区切り文字を推測
-            dialect = csv.Sniffer().sniff(f.read(1024))            
-            
+    def checkDelimter(self, lines, divideNum):
+        num_lines = len(lines)
+        # サンプルをdivideNumで分割した真ん中で評価
+        start = int(divideNum/2) * int(num_lines / divideNum)
+        end = (int(divideNum/2) + 1) * int(num_lines / divideNum)                    
+        # start と end が同じ、または逆転しないよう最低1行は確保
+        if start >= end:
+            end = start + 1                
+        # 文字列のリストを1つの文字列に結合
+        target_text = "".join(lines[start:end])                    
+        # 3. csv.Sniffer に文字列を渡して推測
+        dialect = csv.Sniffer().sniff(target_text)  
         if dialect.delimiter in [",", "\t", " ", "|", ":", ";"]:
-            return True
+            return max(len(line.split(dialect.delimiter)) for line in lines[start:end])
         else:
-            return False
-        
-        #行ごとに区切り文字をカウントする
-        """
-        #下記では、プログラムファイルなどが検知できないケースがある。
-        with open(filename, 'r', encoding='utf-8') as f:
-            header_count = 0
-            row_count = 0
-            delimiter_counts = []
-            for line in f:
-                if row_count == 0:
-                    header_count = line.count(dialect.delimiter)
-                else:
-                    delimiter_counts.append(header_count - line.count(dialect.delimiter))
+            raise Exception("Unexpected delimiter.")                                              
 
-                row_count += 1
+    def forceOuputTsv(self, lines, filename, transversalState):
+        target_text = "".join(lines)                 
+        dialect = csv.Sniffer().sniff(target_text)                                                
+        if dialect.delimiter in [",", "\t", " ", "|", ":", ";"]:
+            max_cols = max(len(line.split(dialect.delimiter)) for line in lines)
+        else:
+            LOG.error("Unexpected delimiter.", transversalState)
+            return ""        
+        col_names = list(range(max_cols))        
+        df = pd.read_csv(filename, header=None, names=col_names) 
+        df.to_csv(f"tmp/{id}.tsv", sep='\t', index=False, header=False)  
+        return f"{id}.tsv"
 
-            print(delimiter_counts)
-        """
+    def analyzeTablefile(self, id, filename, transversalState):
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                # 1. すべての行をリストに読み込む（行数カウントとデータ取得を同時に行う）
+                lines = f.readlines()
+                
+            if len(lines) > 2:
+                try:
+                    max_cols = self.checkDelimter(lines, 3)
+                    col_names = list(range(max_cols))
+                    df = pd.read_csv(filename, header=None, names=col_names) 
+                    df.to_csv(f"tmp/{id}.tsv", sep='\t', index=False, header=False) 
+                    return f"{id}.tsv" 
+                except:
+                    if len(lines) > 4:
+                        max_cols = self.checkDelimter(lines, 5)
+                        col_names = list(range(max_cols))
+                        df = pd.read_csv(filename, header=None, names=col_names) 
+                        df.to_csv(f"tmp/{id}.tsv", sep='\t', index=False, header=False) 
+                        return f"{id}.tsv" 
+                    else:
+                        return self.forceOuputTsv(lines, filename, transversalState)                
+            else:
+                return self.forceOuputTsv(lines, filename, transversalState)
+
+        except Exception as e:
+            LOG.error(e, transversalState)
+            return ""
