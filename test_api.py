@@ -178,7 +178,7 @@ class TestToposoidFileUploadFacadeWeb(object):
         assert(mime == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     @pytest.mark.anyio       
-    async def test_uploadTableUrlOldExcxel(self): 
+    async def test_uploadTableUrlOldExcel(self): 
         async with AsyncClient(
             transport = ASGITransport(app=app), base_url="http://test"
         ) as ac:
@@ -199,6 +199,31 @@ class TestToposoidFileUploadFacadeWeb(object):
         mime_detector = magic.Magic(mime=True)
         mime = mime_detector.from_buffer(checkResponse.content)
         assert(mime == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
+    @pytest.mark.anyio       
+    async def test_uploadTableUrlOldExcel2(self): 
+        async with AsyncClient(
+            transport = ASGITransport(app=app), base_url="http://test"
+        ) as ac:
+                data = {
+                    "featureType": int(FeatureType.TABLE.value),
+                    "url": "https://www.e-stat.go.jp/stat-search/file-download?statInfId=000040410921&fileKind=4"
+                }
+
+                response = await ac.post(url = "http://testserver/upload", headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState}, data=data)
+                assert response.status_code == 200
+
+        uploadResult = UploadResult.parse_obj(response.json())
+        assert(uploadResult.status == UploadStatusType.OK.value)
+        #toposoid-contents-admin側に適切にフォルダに配置されているか？
+        checkResponse = requests.get(uploadResult.url, headers={"X_TOPOSOID_TRANSVERSAL_STATE": self.transversalState})
+        assert checkResponse.status_code == 200  
+        #適切にコンバートされているか？
+        mime_detector = magic.Magic(mime=True)
+        mime = mime_detector.from_buffer(checkResponse.content)
+        assert(mime == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 
     @pytest.mark.anyio
     async def test_uploadTableUrlCsvUTF8(self): 

@@ -23,7 +23,7 @@ import os
 import shutil
 import magic
 from model import TableFileType
-from xls2xlsx import XLS2XLSX
+#from xls2xlsx import XLS2XLSX
 import pandas as pd
 import csv
 from itertools import islice
@@ -71,17 +71,20 @@ class TableAdmin():
         #このファイルがExcelファイルかテキストファイルかを見分ける
         if tableFileType == TableFileType.EXCEL:    
             ext = filename.split(".")[-1]        
-            if not ext == "xslx":
+            if not ext == "xlsx":
+                #例えば, 本当はxlsxだが、xlsなどの拡張子になっている場合
                 #ファイルをリネームして返す
-                shutil.copy(filename, f"tmp/{id}.xslx")    
-            return f"{id}.xslx"      
+                shutil.copy(filename, f"tmp/{id}.xlsx")    
+            return f"{id}.xlsx"      
 
         if tableFileType == TableFileType.EXCEL_OLD:
             #ファイルフォーマットをxslxに変換
-            x2x = XLS2XLSX(filename)
+            #x2x = XLS2XLSX(filename)
             #ファイルをリネームして返す
-            x2x.to_xlsx(f"tmp/{id}.xslx")
-            return f"{id}.xslx"      
+            #x2x.to_xlsx(f"tmp/{id}.xslx")
+            df = pd.read_excel(filename, engine='xlrd')
+            df.to_excel(f"tmp/{id}.xlsx", index=False, engine='openpyxl')
+            return f"{id}.xlsx"      
             
         elif tableFileType == TableFileType.TEXT:            
             with open(filename, 'rb') as f:
