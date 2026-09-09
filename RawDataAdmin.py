@@ -38,7 +38,7 @@ class RawDataAdmin():
                             "Accept-Encoding": "gzip, deflate",
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
                         }
-                        with requests.get(resourceNameOrUrl, stream=True,verify=False, headers=header, timeout=(10.0, 10.0)) as res:
+                        with requests.get(resourceNameOrUrl, stream=True,verify=False, headers=header, timeout=(10.0, 60.0)) as res:
                             #一時的にファイルに保存
                             with open(savepath, "wb") as f:
                                 for chunk in res.iter_content(chunk_size=1024):
