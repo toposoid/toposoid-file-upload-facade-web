@@ -17,9 +17,8 @@
 from fastapi.testclient import TestClient
 from fastapi import status
 from api import app
-from model import UploadResult, UploadStatusType
-from ToposoidCommon.model import TransversalState, StatusInfo
-from ToposoidCommon.constants import FeatureType
+from ToposoidCommon.model import TransversalState, UploadResult
+from ToposoidCommon.constants import FeatureType, UploadStatusType
 import numpy as np
 from time import sleep
 import pytest

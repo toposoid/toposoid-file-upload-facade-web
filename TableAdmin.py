@@ -22,7 +22,7 @@ import io
 import os
 import shutil
 import magic
-from model import TableFileType
+from ToposoidCommon.constants import TableFileType
 #from xls2xlsx import XLS2XLSX
 import pandas as pd
 import csv

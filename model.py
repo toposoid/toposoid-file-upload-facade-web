@@ -14,6 +14,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+"""
 from pydantic import BaseModel, model_validator
 from typing import List, Any
 from enum import Enum
@@ -62,3 +63,4 @@ class UploadResult(BaseModel):
     id: str
     url: str 
     status: int
+"""

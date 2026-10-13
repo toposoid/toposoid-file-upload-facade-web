@@ -16,9 +16,8 @@
 
 
 from fastapi import FastAPI, File, UploadFile, Header, Body, Form, Depends
-from ToposoidCommon.model import StatusInfo, TransversalState
-from ToposoidCommon.constants import FeatureType
-from model import UploadContentContext, UploadResult, UploadStatusType
+from ToposoidCommon.model import StatusInfo, TransversalState, UploadContentContext, UploadResult
+from ToposoidCommon.constants import FeatureType, UploadStatusType
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
